@@ -189,6 +189,8 @@ public class MainTest {
 							System.out.println(e);
 							return;
 						}
+
+                        //completare con controlli nel server
                         System.out.print("Would you repeat?(y/n)");
 						answer=Keyboard.readChar();
 					}
