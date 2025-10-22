@@ -19,6 +19,7 @@ public class MainTest {
 	 * @param args
 	 */
 	private ObjectOutputStream out;
+
 	private ObjectInputStream in ; // stream con richieste del client
 	
 	
@@ -48,16 +49,16 @@ public class MainTest {
 	
 	private String learningFromFile() throws SocketException,ServerException,IOException,ClassNotFoundException{
 		out.writeObject(3);
-		
-		System.out.print("Table Name:");
+		/* System.out.print("Table Name:");
 		String tabName=Keyboard.readString();
-		out.writeObject(tabName);
-		double r=1.0;
-		do{
+		out.writeObject(tabName); */
+		//double r=1.0;
+		/*do{
 			System.out.print("Radius:");
 			r=Keyboard.readDouble();
-		} while(r<=0);
-		out.writeObject(r);
+		} while(r<=0);*/
+		//out.writeObject(r);
+        //out.flush();
 		String result = (String)in.readObject();
 		if(result.equals("OK"))
 			return (String)in.readObject();
@@ -94,8 +95,8 @@ public class MainTest {
 	
 	private void storeClusterInFile() throws SocketException,ServerException,IOException,ClassNotFoundException{
 		out.writeObject(2);
-		
-		
+        String file = Keyboard.readString();
+		out.writeObject(file);
 		String result = (String)in.readObject();
 		if(!result.equals("OK"))
 			 throw new ServerException(result);
