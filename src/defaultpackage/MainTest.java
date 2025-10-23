@@ -13,7 +13,6 @@ import java.net.Socket;
 import keyboardinput.Keyboard;
 
 
-
 public class MainTest {
 
 	/**
@@ -22,8 +21,13 @@ public class MainTest {
 	private ObjectOutputStream out;
 
 	private ObjectInputStream in ; // stream con richieste del client
-	
-	
+
+    /**
+     * Costruttore della classe MainTest.
+     * @param ip, indica l'indirizzo del server.
+     * @param port, porta alla quale si connette il client.
+     * @throws IOException
+     */
 	public MainTest(String ip, int port) throws IOException{
 		InetAddress addr = InetAddress.getByName(ip); //ip
 		System.out.println("addr = " + addr);
@@ -33,6 +37,11 @@ public class MainTest {
 		out = new ObjectOutputStream(socket.getOutputStream());
 		in = new ObjectInputStream(socket.getInputStream());	; // stream con richieste del client
 	}
+
+    /**
+     * Mostra il menu dal quale l'utente può scegliere cosa fare inserendo da tastiera il numero.
+     * @return la risposta dell'utente.
+     */
 	
 	private int menu(){
 		int answer;
@@ -47,6 +56,16 @@ public class MainTest {
 		return answer;
 		
 	}
+
+    /**
+     * Quando l'utente dà come risposta 1, viene chiesto che file si vuole caricare e invia la risposta al server.
+     * Aspetta che il server gli invii l'OK e poi legge il contenuto del file.
+     * @return il contentuo file selezionato.
+     * @throws SocketException
+     * @throws ServerException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
 	
 	private String learningFromFile() throws SocketException,ServerException,IOException,ClassNotFoundException{
 		out.writeObject(3);
@@ -60,6 +79,16 @@ public class MainTest {
 		else throw new ServerException(result);
 		
 	}
+
+    /**
+     * Chiede all'utente da quale tabella del Database prendere i dati inoltrando la risposta al server. Se il client
+     * non riceve l'OK solleva l'eccezione.
+     * @throws SocketException
+     * @throws ServerException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+
 	private void storeTableFromDb() throws SocketException,ServerException,IOException,ClassNotFoundException{
 		out.writeObject(0);
 		System.out.print("Table name:");
@@ -70,6 +99,16 @@ public class MainTest {
 			throw new ServerException(result);
 		
 	}
+
+    /**
+     * Chiede all'utente di inserire il raggio e manda la risposta al server. Aspetta di ricevere l'OK dal server per
+     * stampare il numero di cluster e i centroidi con le tuple.
+     * @return centroidi più popolosi con le tuple.
+     * @throws SocketException
+     * @throws ServerException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
 	private String learningFromDbTable() throws SocketException,ServerException,IOException,ClassNotFoundException{
 		out.writeObject(1);
 		double r=1.0;
@@ -87,6 +126,16 @@ public class MainTest {
 		
 		
 	}
+
+    /**
+     * Richiede all'utente di scrivere il nome con il quale salvare il file. Dopo aver informato il server,
+     * l'utente riceve la conferma che i cluster sono stati salvati nel file in formato dmp.
+     * Se il client non riceve l'OK solleva l'eccezione.
+     * @throws SocketException
+     * @throws ServerException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
 	
 	private void storeClusterInFile() throws SocketException,ServerException,IOException,ClassNotFoundException{
 		out.writeObject(2);
@@ -100,6 +149,12 @@ public class MainTest {
 
             throw new ServerException(result);
 	}
+
+    /**
+     * In base alla risposta dell'utente si divide in due casi nei quali sfrutta i metodi precedentemente descritti.
+     * Al termine richiede se si vuole effettuare una nuova esecuzione.
+     * @param args
+     */
 	public static void main(String[] args) {
 		String ip=args[0];
 		int port = Integer.parseInt(args[1]);
@@ -114,11 +169,13 @@ public class MainTest {
 		
 		
 		do{
+            //legge la risposta dell'utente ottenuta da menu.
 			int menuAnswer=main.menu();
 			switch(menuAnswer)
 			{
 				case 1:
 					try {
+                        //usa il metodo indicato per poi stampare a video il contenuto del file
 						String kmeans=main.learningFromFile();
 						System.out.println(kmeans);
 					}
@@ -144,6 +201,7 @@ public class MainTest {
 				
 					while(true) {
                         try {
+                            //ottiene il nome della tabella
                             main.storeTableFromDb();
                             break; //esce fuori dal while
                         } catch (SocketException e) {
@@ -169,9 +227,10 @@ public class MainTest {
 					do{
 						try
 						{
+                            //richiede il raggio e calcola il cluster più popoloso
 							String clusterSet=main.learningFromDbTable();
 							System.out.println(clusterSet);
-							
+							//successivamente lo salva in un file
 							main.storeClusterInFile();
 
 									
@@ -196,7 +255,7 @@ public class MainTest {
 							return;
 						}
 
-                        //completare con controlli nel server
+
                         System.out.print("Would you repeat?(y/n)");
 						answer=Keyboard.readChar();
 					}
