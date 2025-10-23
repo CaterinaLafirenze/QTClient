@@ -1,12 +1,13 @@
 package defaultpackage;
 
+import java.net.SocketException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
+
 
 
 import keyboardinput.Keyboard;
@@ -49,17 +50,11 @@ public class MainTest {
 	
 	private String learningFromFile() throws SocketException,ServerException,IOException,ClassNotFoundException{
 		out.writeObject(3);
-		/* System.out.print("Table Name:");
-		String tabName=Keyboard.readString();
-		out.writeObject(tabName); */
-		//double r=1.0;
-		/*do{
-			System.out.print("Radius:");
-			r=Keyboard.readDouble();
-		} while(r<=0);*/
-		//out.writeObject(r);
-        //out.flush();
+        System.out.println("Enter file name:");
+        String fileName = Keyboard.readString();
+        out.writeObject(fileName);
 		String result = (String)in.readObject();
+        System.out.println(result);
 		if(result.equals("OK"))
 			return (String)in.readObject();
 		else throw new ServerException(result);
@@ -85,7 +80,7 @@ public class MainTest {
 		out.writeObject(r);
 		String result = (String)in.readObject();
 		if(result.equals("OK")){
-			System.out.println("Number of Clusters:"+in.readObject());
+            System.out.println("Number of Clusters:"+in.readObject());
 			return (String)in.readObject();
 		}
 		else throw new ServerException(result);
@@ -95,12 +90,15 @@ public class MainTest {
 	
 	private void storeClusterInFile() throws SocketException,ServerException,IOException,ClassNotFoundException{
 		out.writeObject(2);
+        System.out.println("Backup file name:");
         String file = Keyboard.readString();
 		out.writeObject(file);
+        System.out.println("\nSaving clusters in " + file +
+                ".dmp\nSaving transaction ended!\n");
 		String result = (String)in.readObject();
 		if(!result.equals("OK"))
-			 throw new ServerException(result);
-		
+
+            throw new ServerException(result);
 	}
 	public static void main(String[] args) {
 		String ip=args[0];
@@ -137,25 +135,28 @@ public class MainTest {
 					} catch (ClassNotFoundException e) {
 						System.out.println(e);
 						return;
-					}
+					}catch (ServerException e) {
+                        System.out.println(e);
+                        return;
+                    }
                     break;
 				case 2: // learning from db
 				
-					while(true){
-						try{
-							main.storeTableFromDb();
-							break; //esce fuori dal while
-						}
-						
-						catch (SocketException e) {
-							System.out.println(e);
-							return;
-						}
-						catch (FileNotFoundException e) {
-							System.out.println(e);
-							return;
-							
-						} catch (IOException e) {
+					while(true) {
+                        try {
+                            main.storeTableFromDb();
+                            break; //esce fuori dal while
+                        } catch (SocketException e) {
+                            System.out.println(e);
+                            return;
+                        }catch(ServerException e){
+                                System.out.println(e);
+                                return;
+                        } catch (FileNotFoundException e) {
+                            System.out.println(e);
+                            return;
+
+                        } catch (IOException e) {
 							System.out.println(e);
 							return;
 						} catch (ClassNotFoundException e) {
@@ -172,12 +173,16 @@ public class MainTest {
 							System.out.println(clusterSet);
 							
 							main.storeClusterInFile();
+
 									
 						}
 						catch (SocketException e) {
 							System.out.println(e);
 							return;
-						}
+						}catch(ServerException e){
+                            System.out.println(e);
+                            return;
+                        }
 						catch (FileNotFoundException e) {
 							System.out.println(e);
 							return;
@@ -185,6 +190,7 @@ public class MainTest {
 						catch (ClassNotFoundException e) {
 							System.out.println(e);
 							return;
+
 						}catch (IOException e) {
 							System.out.println(e);
 							return;
