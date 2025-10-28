@@ -73,7 +73,6 @@ public class MainTest {
         String fileName = Keyboard.readString();
         out.writeObject(fileName);
 		String result = (String)in.readObject();
-        System.out.println(result);
 		if(result.equals("OK"))
 			return (String)in.readObject();
 		else throw new ServerException(result);
