@@ -35,7 +35,7 @@ public class MainTest {
 		System.out.println(socket);
 		
 		out = new ObjectOutputStream(socket.getOutputStream());
-		in = new ObjectInputStream(socket.getInputStream());	; // stream con richieste del client
+		in = new ObjectInputStream(socket.getInputStream());	 // stream con richieste del client
 	}
 
     /**
@@ -88,16 +88,19 @@ public class MainTest {
      * @throws ClassNotFoundException
      */
 
-	private void storeTableFromDb() throws SocketException,ServerException,IOException,ClassNotFoundException{
-		out.writeObject(0);
-		System.out.print("Table name:");
-		String tabName=Keyboard.readString();
-		out.writeObject(tabName);
-		String result = (String)in.readObject();
-		if(!result.equals("OK"))
-			throw new ServerException(result);
-		
-	}
+    private void storeTableFromDb() throws SocketException,ServerException,IOException,ClassNotFoundException{
+        out.writeObject(0);
+        String tabName;
+        do{
+            System.out.print("Table name:");
+            tabName = Keyboard.readString();
+        }while(!tabName.equals("playtennis"));
+        out.writeObject(tabName);
+        String result = (String)in.readObject();
+        if(!result.equals("OK"))
+            throw new ServerException(result);
+
+    }
 
     /**
      * Chiede all'utente di inserire il raggio e manda la risposta al server. Aspetta di ricevere l'OK dal server per
@@ -254,21 +257,23 @@ public class MainTest {
 							return;
 						}
 
+                        do{
+                            System.out.print("Would you repeat?(y/n)");
+                            answer=Keyboard.readChar();
+                        }while(Character.toLowerCase(answer)!='y' && Character.toLowerCase(answer)!='n');
 
-                        System.out.print("Would you repeat?(y/n)");
-						answer=Keyboard.readChar();
-					}
-					while(Character.toLowerCase(answer)=='y');
-					break; //fine case 2
-					default:
-					System.out.println("Invalid option!");
+
+					} while(Character.toLowerCase(answer)=='y');
+                    break;
 			}
-			
-			System.out.print("would you choose a new operation from menu?(y/n)");
-			if(Keyboard.readChar()!='y')
-				break;
-			}
-		while(true);
+            char answer;
+			do{
+                System.out.print("would you choose a new operation from menu?(y/n)");
+                answer = Keyboard.readChar();
+            } while(Character.toLowerCase(answer)!='y' && Character.toLowerCase(answer)!='n');
+            if(answer != 'y')
+                break;
+        } while(true);
 		}
 	}
 
