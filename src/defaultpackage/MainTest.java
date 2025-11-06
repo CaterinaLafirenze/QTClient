@@ -7,7 +7,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-
+import java.util.ArrayList;
+import java.util.List;
 
 
 import keyboardinput.Keyboard;
@@ -21,6 +22,8 @@ public class MainTest {
 	private ObjectOutputStream out;
 
 	private ObjectInputStream in ; // stream con richieste del client
+
+    private List<String> fileList= new ArrayList<>();
 
     /**
      * Costruttore della classe MainTest.
@@ -69,15 +72,22 @@ public class MainTest {
 	
 	private String learningFromFile() throws SocketException,ServerException,IOException,ClassNotFoundException{
 		out.writeObject(3);
-        System.out.println("Enter file name:");
-        String fileName = Keyboard.readString();
-        out.writeObject(fileName);
-		String result = (String)in.readObject();
-		if(result.equals("OK"))
-			return (String)in.readObject();
-		else throw new ServerException(result);
-		
-	}
+        do{
+            System.out.println("Enter file name:");
+            String fileName = Keyboard.readString();
+            if(fileList.contains(fileName)){
+                out.writeObject(fileName);
+                String result = (String)in.readObject();
+                if(result.equals("OK"))
+                    return (String)in.readObject();
+                else throw new ServerException(result);
+            }else {
+                System.out.println("File not found.");
+
+            }
+        }while(true);
+
+    }
 
     /**
      * Chiede all'utente da quale tabella del Database prendere i dati inoltrando la risposta al server. Se il client
@@ -143,6 +153,7 @@ public class MainTest {
 		out.writeObject(2);
         System.out.println("Backup file name:");
         String file = Keyboard.readString();
+        fileList.add(file);
 		out.writeObject(file);
         System.out.println("\nSaving clusters in " + file +
                 ".dmp\nSaving transaction ended!\n");
@@ -232,8 +243,9 @@ public class MainTest {
                             //richiede il raggio e calcola il cluster più popoloso
 							String clusterSet=main.learningFromDbTable();
 							System.out.println(clusterSet);
-							//successivamente lo salva in un file
-							main.storeClusterInFile();
+                            if(!clusterSet.isEmpty())
+							    //successivamente lo salva in un file
+							    main.storeClusterInFile();
 
 									
 						}
